@@ -1,3 +1,7 @@
+with st.container():
+    st.markdown('<div style="background-color: #ffffff; padding: 30px; border-radius: 15px; border: 1px solid #eee; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">', unsafe_allow_html=True)
+    # Inserisci qui i tuoi st.text_input o st.file_uploader
+    st.markdown('</div>', unsafe_allow_html=True)
 import streamlit as st
 import hashlib
 import datetime
