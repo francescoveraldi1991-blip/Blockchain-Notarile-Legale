@@ -58,17 +58,46 @@ def apply_custom_design():
 apply_custom_design()
 
 # --- IL RESTO DEL TUO CODICE HOME ---
-st.title("⚖️ NotaryChain Pro")
-st.markdown("---")
-st.write("### L'eccellenza della Blockchain al servizio della Legge.")
+# --- PARTE ALTA (Mantieni questa) ---
 import streamlit as st
 
-st.set_page_config(page_title="Studio Notarile Digitale", layout="centered")
+def apply_custom_design():
+    # ... (il codice CSS del Passo 1) ...
 
-st.title("⚖️ Benvenuti nello Studio Notarile Blockchain")
-st.write("Questo sistema modulare garantisce la massima stabilità e conformità legale.")
-st.info("Usa il menu a sinistra per navigare tra le diverse sezioni del software.")
+apply_custom_design()
 
+st.title("⚖️ NotaryChain Pro")
+st.markdown("---")
+
+# =========================================================
+# QUI SOSTITUISCI: Cancella i vecchi st.write e st.info
+# E INCOLLA IL CODICE DEL PASSO 2:
+# =========================================================
+
+col1, col2 = st.columns([2, 1])
+
+with col1:
+    st.markdown("## Sicurezza. Trasparenza. Futuro.")
+    st.write("""
+        Benvenuti nell'ecosistema **NotaryChain**. 
+        La nostra tecnologia trasforma il concetto di 'Data Certa' in uno standard 
+        digitale immutabile, proteggendo la proprietà intellettuale e le 
+        volontà testamentarie con crittografia di grado militare.
+    """)
+    st.button("Esplora l'Archivio")
+
+with col2:
+    st.markdown("![Legal Icon](https://img.icons8.com/ios-filled/150/1a2a6c/law.png)")
+
+# =========================================================
+# FINE SOSTITUZIONE
+# =========================================================
+
+st.markdown("---")
+
+# --- PARTE BASSA (Mantieni questa per non perdere i dati) ---
+if 'blockchain' not in st.session_state:
+    st.session_state.blockchain = []
 # Inizializziamo il registro una sola volta per tutte le pagine
 if 'blockchain' not in st.session_state:
     st.session_state.blockchain = []
