@@ -1,34 +1,40 @@
+import streamlit as st
 import hashlib
 import datetime
 
-class BloccoNotarile:
-    def __init__(self, indice, nome_atto, contenuto_contratto, hash_precedente):
-        self.indice = indice
-        self.data_ora = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        self.nome_atto = nome_atto
-        # Creiamo l'impronta digitale (Hash) del contratto per la sicurezza cyber
-        self.impronta_digitale = hashlib.sha256(contenuto_contratto.encode()).hexdigest()
-        self.hash_precedente = hash_precedente
+st.set_page_config(page_title="Notaio Blockchain", page_icon="⚖️")
 
-    def visualizza_atto(self):
-        print(f"--- ATTO NUMERO: {self.indice} ---")
-        print(f"Nome: {self.nome_atto}")
-        print(f"Data Certa (Blockchain): {self.data_ora}")
-        print(f"Impronta Digitale (SHA-256): {self.impronta_digitale}")
-        print(f"Collegamento al blocco precedente: {self.hash_precedente}")
-        print("-" * 30)
+st.title("⚖️ Sistema Notarile Blockchain")
+st.subheader("Certificazione Contratti e Testamenti Digitali")
 
-# Creiamo il Registro (la catena)
-blockchain_notarile = []
+# Inizializziamo la "catena" nella memoria della pagina
+if 'blockchain' not in st.session_state:
+    st.session_state.blockchain = []
 
-# Funzione per "Notarizzare" un nuovo atto
-def aggiungi_atto(nome, testo):
-    hash_prec = blockchain_notarile[-1].impronta_digitale if blockchain_notarile else "0"
-    nuovo_blocco = BloccoNotarile(len(blockchain_notarile)+1, nome, testo, hash_prec)
-    blockchain_notarile.append(nuovo_blocco)
-    nuovo_blocco.visualizza_atto()
+nome_atto = st.text_input("Nome dell'Atto (es. Rep. 101 / Testamento Rossi)")
+testo_atto = st.text_area("Contenuto del Contratto o Impronta Hash")
 
-# --- PROVA PRATICA ---
-print("REGISTRO NOTARILE DIGITALE ATTIVO\n")
-aggiungi_atto("Contratto Compravendita Rossi-Bianchi", "Il sig. Rossi vende al sig. Bianchi...")
-aggiungi_atto("Testamento Digitale Sig. Verdi", "Lascio i miei beni digitali a...")
+if st.button("Registra Atto con Data Certa"):
+    if nome_atto and testo_atto:
+        # Calcolo Hash e Data
+        data_ora = datetime.datetime.now().strftime("%d/%m/%Y - %H:%M:%S")
+        impronta = hashlib.sha256(testo_atto.encode()).hexdigest()
+        
+        # Salvataggio nel registro
+        nuovo_blocco = {
+            "indice": len(st.session_state.blockchain) + 1,
+            "nome": nome_atto,
+            "data": data_ora,
+            "hash": impronta
+        }
+        st.session_state.blockchain.append(nuovo_blocco)
+        st.success(f"Atto Registrato con successo! Data certa: {data_ora}")
+    else:
+        st.error("Per favore, compila tutti i campi.")
+
+st.divider()
+st.write("### 📜 Registro degli Atti Notarizzati")
+for blocco in reversed(st.session_state.blockchain):
+    with st.expander(f"Atto n. {blocco['indice']} - {blocco['nome']}"):
+        st.write(f"**Data Certa:** {blocco['data']}")
+        st.write(f"**Impronta Digitale (SHA-256):** `{blocco['hash']}`")
