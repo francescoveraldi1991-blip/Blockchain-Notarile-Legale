@@ -1,26 +1,13 @@
 import streamlit as st
 
-# 1. DEFINIZIONE DELLA FUNZIONE (Tutto quello che è "dentro" è spostato a destra)
+# 1. DESIGN PERSONALIZZATO
 def apply_custom_design():
     st.markdown("""
         <style>
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@300;400;600&display=swap');
-        
-        html, body, [class*="css"] {
-            font-family: 'Inter', sans-serif;
-            color: #2c3e50;
-        }
-
-        h1, h2, h3 {
-            font-family: 'Playfair Display', serif !important;
-            color: #1a2a6c;
-        }
-
-        [data-testid="stSidebar"] {
-            background-color: #f8f9fa;
-            border-right: 1px solid #e0e0e0;
-        }
-
+        html, body, [class*="css"] { font-family: 'Inter', sans-serif; color: #2c3e50; }
+        h1, h2, h3 { font-family: 'Playfair Display', serif !important; color: #1a2a6c; }
+        [data-testid="stSidebar"] { background-color: #f8f9fa; border-right: 1px solid #e0e0e0; }
         div.stButton > button {
             background-color: #1a2a6c;
             color: white;
@@ -29,8 +16,8 @@ def apply_custom_design():
             padding: 10px 24px;
             transition: all 0.3s ease;
             font-weight: 600;
+            width: 100%; /* Occupa tutta la larghezza della colonna */
         }
-        
         div.stButton > button:hover {
             background-color: #b89333;
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
@@ -39,10 +26,13 @@ def apply_custom_design():
         </style>
     """, unsafe_allow_html=True)
 
-# 2. CHIAMATA DELLA FUNZIONE (Questa riga torna a inizio riga, senza spazi)
 apply_custom_design()
 
-# 3. CONTENUTO DELLA PAGINA
+# 2. INIZIALIZZAZIONE DATI (Deve stare prima di ogni altra operazione)
+if 'blockchain' not in st.session_state:
+    st.session_state.blockchain = []
+
+# 3. INTERFACCIA HOME
 st.title("⚖️ NotaryChain Pro")
 st.markdown("---")
 
@@ -56,13 +46,13 @@ with col1:
         digitale immutabile, proteggendo la proprietà intellettuale e le 
         volontà testamentarie con crittografia di grado militare.
     """)
-    st.button("Entra nella blockchain legale")
+    
+    # --- IL PULSANTE DI COLLEGAMENTO ---
+    if st.button("ENTRA NELLA BLOCKCHAIN LEGALE"):
+        st.switch_page("pages/1_Contratti_Blockchain.py")
 
 with col2:
     st.markdown("![Legal Icon](https://img.icons8.com/ios-filled/150/1a2a6c/law.png)")
 
 st.markdown("---")
-
-# 4. INIZIALIZZAZIONE BLOCKCHAIN (Fondamentale a fine pagina)
-if 'blockchain' not in st.session_state:
-    st.session_state.blockchain = []
+st.info("Scegli un modulo dal menu a sinistra o clicca il pulsante principale per iniziare.")
