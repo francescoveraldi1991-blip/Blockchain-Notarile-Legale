@@ -56,7 +56,7 @@ with col1:
         digitale immutabile, proteggendo la proprietà intellettuale e le 
         volontà testamentarie con crittografia di grado militare.
     """)
-    st.button("Esplora l'Archivio")
+    st.button("Entra nella blockchain legale")
 
 with col2:
     st.markdown("![Legal Icon](https://img.icons8.com/ios-filled/150/1a2a6c/law.png)")
