@@ -1,0 +1,34 @@
+import hashlib
+import datetime
+
+class BloccoNotarile:
+    def __init__(self, indice, nome_atto, contenuto_contratto, hash_precedente):
+        self.indice = indice
+        self.data_ora = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        self.nome_atto = nome_atto
+        # Creiamo l'impronta digitale (Hash) del contratto per la sicurezza cyber
+        self.impronta_digitale = hashlib.sha256(contenuto_contratto.encode()).hexdigest()
+        self.hash_precedente = hash_precedente
+
+    def visualizza_atto(self):
+        print(f"--- ATTO NUMERO: {self.indice} ---")
+        print(f"Nome: {self.nome_atto}")
+        print(f"Data Certa (Blockchain): {self.data_ora}")
+        print(f"Impronta Digitale (SHA-256): {self.impronta_digitale}")
+        print(f"Collegamento al blocco precedente: {self.hash_precedente}")
+        print("-" * 30)
+
+# Creiamo il Registro (la catena)
+blockchain_notarile = []
+
+# Funzione per "Notarizzare" un nuovo atto
+def aggiungi_atto(nome, testo):
+    hash_prec = blockchain_notarile[-1].impronta_digitale if blockchain_notarile else "0"
+    nuovo_blocco = BloccoNotarile(len(blockchain_notarile)+1, nome, testo, hash_prec)
+    blockchain_notarile.append(nuovo_blocco)
+    nuovo_blocco.visualizza_atto()
+
+# --- PROVA PRATICA ---
+print("REGISTRO NOTARILE DIGITALE ATTIVO\n")
+aggiungi_atto("Contratto Compravendita Rossi-Bianchi", "Il sig. Rossi vende al sig. Bianchi...")
+aggiungi_atto("Testamento Digitale Sig. Verdi", "Lascio i miei beni digitali a...")
