@@ -60,7 +60,7 @@ def apply_custom_design():
         /* Nasconde i testi "Drag and drop" e "Limit 200MB" che creano confusione */
         [data-testid="stFileUploader"] section div div {
             font-size: 0px !important;
-            color: transparent !important;
+            color: bianco !important;
         }
         
         /* Fa riemergere solo il pulsante Browse */
