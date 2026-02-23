@@ -80,7 +80,7 @@ col1, col2 = st.columns([2, 1], gap="large")
 with col1:
     st.markdown("## Sicurezza. Trasparenza. Futuro.")
     
-    # --- TESTO MODIFICATO IN BLU ---
+    # --- TESTO IN BLU ---
     st.markdown("""
         <p class="testo-introduzione">
             Benvenuti nell'ecosistema <b>NotaryChain</b>. <br>
@@ -92,13 +92,12 @@ with col1:
     
     st.markdown("<br>", unsafe_allow_html=True)
     
+    # --- IL COLLEGAMENTO CHE HAI CHIESTO ---
     if st.button("ENTRA NELLA BLOCKCHAIN LEGALE"):
-        try:
-            st.switch_page("pages/notarizzazione.py")
-        except:
-            st.error("⚠️ Errore: Il file 'notarizzazione.py' non è stato trovato nella cartella 'pages'.")
+        st.switch_page("pages/1_Notarizzazione.py")
 
 with col2:
+    # Immagine istituzionale
     st.markdown("![Legal Icon](https://img.icons8.com/ios-filled/150/1a2a6c/law.png)")
 
 st.markdown("---")
