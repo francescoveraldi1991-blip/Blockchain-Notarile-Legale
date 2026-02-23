@@ -8,7 +8,7 @@ st.set_page_config(
     layout="wide"
 )
 
-# 2. DESIGN COORDINATO LUXURY (CORRETTO)
+# 2. DESIGN COORDINATO LUXURY (FIX SOVRAPPOSIZIONE E COLORI)
 def apply_custom_design():
     st.markdown("""
         <style>
@@ -40,28 +40,35 @@ def apply_custom_design():
             margin-bottom: 20px;
         }
 
-        /* INPUT RICERCA (FORZATI BIANCHI) */
-        input { color: #000000 !important; }
-        div[data-baseweb="input"] { background-color: white !important; }
-        .stTextInput>div>div>input {
+        /* INPUT RICERCA (TOTAL WHITE FIX) */
+        .stTextInput input {
             background-color: white !important;
+            color: black !important;
             border: 2px solid #b89333 !important;
             border-radius: 10px !important;
-            color: #000000 !important;
         }
-
-        /* FILE UPLOADER (BIANCO E ORO) */
+        
+        /* FILE UPLOADER FIX (RIMOZIONE TESTI SOVRAPPOSTI) */
         [data-testid="stFileUploader"] section {
             background-color: white !important;
             border: 2px dashed #b89333 !important;
             border-radius: 12px !important;
+            padding: 20px !important;
         }
+        
+        /* Nasconde il testo "Limit 200MB" che causa la sovrapposizione */
+        [data-testid="stFileUploaderDeleteBtn"] ~ div {
+            display: none !important;
+        }
+        [data-testid="stFileUploader"] small {
+            display: none !important;
+        }
+
         [data-testid="stFileUploader"] button {
             background-color: white !important;
             color: #b89333 !important;
             border: 1px solid #b89333 !important;
-            font-size: 0.8rem !important;
-            overflow: hidden; /* Evita sovrapposizioni */
+            font-weight: 600 !important;
         }
 
         /* PULSANTI */
@@ -71,20 +78,19 @@ def apply_custom_design():
             border: 1px solid #b89333 !important;
             border-radius: 8px !important;
             font-weight: 600 !important;
-            transition: 0.3s;
         }
         div.stButton > button:hover, .stDownloadButton > button:hover {
             background-color: #b89333 !important;
             color: white !important;
         }
 
-        /* PULSANTE ELIMINA (ROSSO SOFT) */
-        .btn-delete > div > button {
+        /* PULSANTE ELIMINA */
+        .btn-delete button {
             border: 1px solid #ff4b4b !important;
             color: #ff4b4b !important;
-            font-size: 0.7rem !important;
+            background-color: transparent !important;
         }
-        .btn-delete > div > button:hover {
+        .btn-delete button:hover {
             background-color: #ff4b4b !important;
             color: white !important;
         }
@@ -112,7 +118,7 @@ st.markdown('<p style="font-size: 1.1rem; color: #1a2a6c;">Gestione e validazion
 # --- VERIFICA ORIGINALITÀ ---
 with st.expander("🛡️ Verifica Integrità Documento"):
     st.markdown('<div class="notary-card">', unsafe_allow_html=True)
-    file_da_verificare = st.file_uploader("Carica il file da controllare", type=["pdf"], key="verify_upload", label_visibility="collapsed")
+    file_da_verificare = st.file_uploader("Carica file", type=["pdf"], key="verify_upload", label_visibility="collapsed")
     if file_da_verificare:
         hash_check = hashlib.sha256(file_da_verificare.getvalue()).hexdigest()
         match = next((x for x in st.session_state.blockchain if x['hash'] == hash_check), None)
@@ -129,9 +135,9 @@ st.markdown('<div class="notary-card">', unsafe_allow_html=True)
 st.subheader("🔍 Filtri di Ricerca")
 c1, c2 = st.columns(2)
 with c1:
-    search_cf = st.text_input("Ricerca per Codice Fiscale", key="search_cf").upper()
+    search_cf = st.text_input("Codice Fiscale", key="search_cf_arch").upper()
 with c2:
-    search_piva = st.text_input("Ricerca per Partita IVA", key="search_piva")
+    search_piva = st.text_input("Partita IVA", key="search_piva_arch")
 st.markdown('</div>', unsafe_allow_html=True)
 
 query_effettiva = search_cf if search_cf else search_piva
@@ -142,7 +148,6 @@ st.subheader("📑 Atti Registrati")
 if not st.session_state.blockchain:
     st.info("Nessun atto registrato.")
 else:
-    # Filtriamo gli atti
     atti_filtrati = [atto for atto in st.session_state.blockchain if query_effettiva in atto['identificativo'].upper() or not query_effettiva]
 
     for i, atto in enumerate(atti_filtrati):
@@ -154,24 +159,19 @@ else:
             </div>
             <p style="margin-bottom:5px;"><b>Identificativo:</b> {atto['identificativo']}</p>
             <div class="hash-text">{atto['hash']}</div>
-            <div style="margin-top:15px; display: flex; gap: 10px;">
+            <div style="margin-top:15px;">
         """, unsafe_allow_html=True)
         
-        # Colonna per i pulsanti
         col_btn1, col_btn2, col_vuota = st.columns([1, 1, 2])
-        
         with col_btn1:
-            cert_content = f"CERTIFICATO: {atto['nome']}\nData: {atto['data']}\nHash: {atto['hash']}"
+            cert_content = f"CERTIFICATO NOTARILE\nAtto: {atto['nome']}\nData: {atto['data']}\nHash: {atto['hash']}"
             st.download_button("📄 SCARICA", cert_content, file_name=f"Certificato_{i}.txt", key=f"dl_{i}")
-        
         with col_btn2:
             st.markdown('<div class="btn-delete">', unsafe_allow_html=True)
             if st.button("🗑️ ELIMINA", key=f"del_{i}"):
-                # Logica eliminazione: rimuove l'atto dalla sessione usando l'hash come riferimento
                 st.session_state.blockchain = [x for x in st.session_state.blockchain if x['hash'] != atto['hash']]
                 st.rerun()
             st.markdown('</div>', unsafe_allow_html=True)
-        
         st.markdown("</div></div>", unsafe_allow_html=True)
 
 st.sidebar.markdown("---")
