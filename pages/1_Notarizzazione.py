@@ -9,7 +9,7 @@ st.set_page_config(
     layout="wide"
 )
 
-# 2. DESIGN COORDINATO, POTENZIATO E SINCRONIZZATO
+# 2. DESIGN COORDINATO LUXURY (WHITE & GOLD BUTTONS)
 def apply_custom_design():
     st.markdown("""
         <style>
@@ -45,17 +45,29 @@ def apply_custom_design():
             color: #1a2a6c !important;
         }
 
-        /* FORZATURA PULSANTE "BROWSE FILES" (Quello che vedevi scuro) */
-        [data-testid="stFileUploader"] button {
+        /* --- PULSANTI: SFONDO BIANCO, BORDO E TESTO ORO --- */
+        /* Questo colpisce sia il tasto 'Browse' che il tasto 'Sigilla' */
+        div.stButton > button, [data-testid="stFileUploader"] button {
             background-color: white !important;
             color: #b89333 !important;
-            border: 1px solid #b89333 !important;
+            border: 2px solid #b89333 !important;
+            border-radius: 12px !important;
+            padding: 12px 30px !important;
+            font-family: 'Inter', sans-serif !important;
             font-weight: 600 !important;
+            font-size: 1.1rem !important;
+            width: 100%;
+            transition: all 0.3s ease !important;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
-        [data-testid="stFileUploader"] button:hover {
-            background-color: #fcf8ee !important;
-            border-color: #1a2a6c !important;
-            color: #1a2a6c !important;
+        
+        /* Effetto Hover: Inverte i colori o scurisce il bordo */
+        div.stButton > button:hover, [data-testid="stFileUploader"] button:hover {
+            background-color: #b89333 !important;
+            color: white !important;
+            box-shadow: 0 4px 15px rgba(184, 147, 51, 0.3) !important;
+            border-color: #b89333 !important;
         }
 
         /* --- CARD CENTRALE --- */
@@ -66,33 +78,6 @@ def apply_custom_design():
             border: 1px solid #eee;
             box-shadow: 0 10px 30px rgba(0,0,0,0.05);
             margin-top: 20px;
-        }
-
-        /* --- PULSANTE SIGILLA (SINCRONIZZATO AL 100% CON LA HOME) --- */
-        div.stButton > button {
-            background: linear-gradient(135deg, #1a2a6c 0%, #b89333 100%) !important;
-            color: white !important;
-            border-radius: 12px !important;
-            border: none !important;
-            padding: 15px 30px !important;
-            font-family: 'Inter', sans-serif !important;
-            font-weight: 600 !important;
-            font-size: 1.1rem !important;
-            width: 100%;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important;
-            transition: all 0.3s ease !important;
-            text-transform: none !important;
-        }
-        
-        div.stButton > button:hover {
-            transform: translateY(-3px) !important;
-            box-shadow: 0 6px 20px rgba(184, 147, 51, 0.4) !important;
-            color: #ffffff !important;
-        }
-
-        /* Rimuoviamo eventuali bordi scuri residui di Streamlit */
-        div[data-baseweb="input"] {
-            border: none !important;
         }
         </style>
     """, unsafe_allow_html=True)
@@ -105,7 +90,7 @@ if 'blockchain' not in st.session_state:
 
 # 4. CONTENUTO PAGINA
 st.title("📄 Notarizzazione Digitale")
-st.markdown('<p style="font-size: 1.1rem; color: #1a2a6c;">Inserisci i dati dell\'atto e sigillali in modo immutabile.</p>', unsafe_allow_html=True)
+st.markdown('<p style="font-size: 1.1rem; color: #1a2a6c;">Inserisci i dati dell\'atto e sigillali in modo immutabile nel registro legale.</p>', unsafe_allow_html=True)
 
 st.markdown("---")
 
@@ -126,6 +111,7 @@ with col_main:
         st.markdown("<br>", unsafe_allow_html=True)
         certificazione = st.checkbox("Confermo l'integrità e la paternità del documento.")
         
+        # Il pulsante ora seguirà lo stile White & Gold definito sopra
         submit = st.form_submit_button("SIGILLA ATTO NELLA BLOCKCHAIN")
         
         if submit:
