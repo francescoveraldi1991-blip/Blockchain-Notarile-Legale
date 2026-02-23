@@ -8,7 +8,7 @@ st.set_page_config(
     layout="wide"
 )
 
-# 2. DESIGN COORDINATO LUXURY (FIX SOVRAPPOSIZIONE E COLORI)
+# 2. DESIGN COORDINATO LUXURY (ULTRA FIX SOVRAPPOSIZIONE)
 def apply_custom_design():
     st.markdown("""
         <style>
@@ -38,9 +38,10 @@ def apply_custom_design():
             border: 1px solid #f1f1f1;
             box-shadow: 0 15px 35px rgba(0,0,0,0.05);
             margin-bottom: 20px;
+            position: relative;
         }
 
-        /* INPUT RICERCA (TOTAL WHITE FIX) */
+        /* INPUT RICERCA (TOTAL WHITE) */
         .stTextInput input {
             background-color: white !important;
             color: black !important;
@@ -48,30 +49,30 @@ def apply_custom_design():
             border-radius: 10px !important;
         }
         
-        /* FILE UPLOADER FIX (RIMOZIONE TESTI SOVRAPPOSTI) */
+        /* --- FIX RADICALE SOVRAPPOSIZIONE FILE UPLOADER --- */
         [data-testid="stFileUploader"] section {
             background-color: white !important;
             border: 2px dashed #b89333 !important;
             border-radius: 12px !important;
-            padding: 20px !important;
+            padding: 30px !important;
         }
         
-        /* Nasconde il testo "Limit 200MB" che causa la sovrapposizione */
-        [data-testid="stFileUploaderDeleteBtn"] ~ div {
-            display: none !important;
+        /* Nasconde i testi "Drag and drop" e "Limit 200MB" che creano confusione */
+        [data-testid="stFileUploader"] section div div {
+            font-size: 0px !important;
+            color: transparent !important;
         }
-        [data-testid="stFileUploader"] small {
-            display: none !important;
-        }
-
+        
+        /* Fa riemergere solo il pulsante Browse */
         [data-testid="stFileUploader"] button {
             background-color: white !important;
             color: #b89333 !important;
             border: 1px solid #b89333 !important;
-            font-weight: 600 !important;
+            font-size: 0.8rem !important;
+            margin-top: 10px !important;
         }
 
-        /* PULSANTI */
+        /* PULSANTI GENERALI */
         div.stButton > button, .stDownloadButton > button {
             background-color: white !important;
             color: #b89333 !important;
@@ -88,7 +89,6 @@ def apply_custom_design():
         .btn-delete button {
             border: 1px solid #ff4b4b !important;
             color: #ff4b4b !important;
-            background-color: transparent !important;
         }
         .btn-delete button:hover {
             background-color: #ff4b4b !important;
@@ -103,6 +103,7 @@ def apply_custom_design():
             border-radius: 8px;
             font-size: 0.85rem;
             word-break: break-all;
+            margin-bottom: 20px;
         }
         </style>
     """, unsafe_allow_html=True)
@@ -113,12 +114,13 @@ if 'blockchain' not in st.session_state:
     st.session_state.blockchain = []
 
 st.title("📜 Archivio e Verifica")
-st.markdown('<p style="font-size: 1.1rem; color: #1a2a6c;">Gestione e validazione degli atti notarizzati.</p>', unsafe_allow_html=True)
+st.markdown('<p style="font-size: 1.1rem; color: #1a2a6c;">Gestione e validazione legale dei tuoi atti.</p>', unsafe_allow_html=True)
 
 # --- VERIFICA ORIGINALITÀ ---
 with st.expander("🛡️ Verifica Integrità Documento"):
     st.markdown('<div class="notary-card">', unsafe_allow_html=True)
-    file_da_verificare = st.file_uploader("Carica file", type=["pdf"], key="verify_upload", label_visibility="collapsed")
+    st.write("Trascina un file per confrontarlo con il registro:")
+    file_da_verificare = st.file_uploader("", type=["pdf"], key="verify_upload", label_visibility="collapsed")
     if file_da_verificare:
         hash_check = hashlib.sha256(file_da_verificare.getvalue()).hexdigest()
         match = next((x for x in st.session_state.blockchain if x['hash'] == hash_check), None)
@@ -151,28 +153,30 @@ else:
     atti_filtrati = [atto for atto in st.session_state.blockchain if query_effettiva in atto['identificativo'].upper() or not query_effettiva]
 
     for i, atto in enumerate(atti_filtrati):
-        st.markdown(f"""
-        <div class="notary-card">
-            <div style="display: flex; justify-content: space-between;">
-                <h3 style='margin:0;'>{atto['nome']}</h3>
-                <span style="color: #b89333; font-weight: bold;">{atto['data']}</span>
-            </div>
-            <p style="margin-bottom:5px;"><b>Identificativo:</b> {atto['identificativo']}</p>
-            <div class="hash-text">{atto['hash']}</div>
-            <div style="margin-top:15px;">
-        """, unsafe_allow_html=True)
-        
-        col_btn1, col_btn2, col_vuota = st.columns([1, 1, 2])
-        with col_btn1:
-            cert_content = f"CERTIFICATO NOTARILE\nAtto: {atto['nome']}\nData: {atto['data']}\nHash: {atto['hash']}"
-            st.download_button("📄 SCARICA", cert_content, file_name=f"Certificato_{i}.txt", key=f"dl_{i}")
-        with col_btn2:
-            st.markdown('<div class="btn-delete">', unsafe_allow_html=True)
-            if st.button("🗑️ ELIMINA", key=f"del_{i}"):
-                st.session_state.blockchain = [x for x in st.session_state.blockchain if x['hash'] != atto['hash']]
-                st.rerun()
-            st.markdown('</div>', unsafe_allow_html=True)
-        st.markdown("</div></div>", unsafe_allow_html=True)
+        # Card contenitore
+        with st.container():
+            st.markdown(f"""
+            <div class="notary-card">
+                <div style="display: flex; justify-content: space-between;">
+                    <h3 style='margin:0;'>{atto['nome']}</h3>
+                    <span style="color: #b89333; font-weight: bold;">{atto['data']}</span>
+                </div>
+                <p style="margin-bottom:5px;"><b>Identificativo:</b> {atto['identificativo']}</p>
+                <div class="hash-text">{atto['hash']}</div>
+            """, unsafe_allow_html=True)
+            
+            # Posizionamento pulsanti in fondo a destra
+            c_vuota, c_btn1, c_btn2 = st.columns([2.5, 0.8, 0.7])
+            with c_btn1:
+                cert_content = f"CERTIFICATO NOTARILE\n\nAtto: {atto['nome']}\nData: {atto['data']}\nID: {atto['identificativo']}\nHash: {atto['hash']}"
+                st.download_button("📄 SCARICA", cert_content, file_name=f"Certificato_{i}.txt", key=f"dl_{i}")
+            with c_btn2:
+                st.markdown('<div class="btn-delete">', unsafe_allow_html=True)
+                if st.button("🗑️ ELIMINA", key=f"del_{i}"):
+                    st.session_state.blockchain = [x for x in st.session_state.blockchain if x['hash'] != atto['hash']]
+                    st.rerun()
+                st.markdown('</div>', unsafe_allow_html=True)
+            st.markdown("</div>", unsafe_allow_html=True)
 
 st.sidebar.markdown("---")
 st.sidebar.write(f"📊 Totale atti: **{len(st.session_state.blockchain)}**")
