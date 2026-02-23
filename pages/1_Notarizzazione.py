@@ -9,7 +9,7 @@ st.set_page_config(
     layout="wide"
 )
 
-# 2. DESIGN COORDINATO (SIDEBAR SCURA + TESTI BLU)
+# 2. DESIGN COORDINATO (TUTTI I TESTI IN BLU)
 def apply_custom_design():
     st.markdown("""
         <style>
@@ -20,13 +20,13 @@ def apply_custom_design():
             background-color: #fdfdfd;
         }
 
-        /* --- SIDEBAR SCURA PROFESSIONALE (Coerente con Home) --- */
+        /* --- SIDEBAR SCURA PROFESSIONALE --- */
         [data-testid="stSidebar"] {
             background-color: #0e1621 !important;
             border-right: 3px solid #b89333;
         }
 
-        /* --- TESTI SIDEBAR --- */
+        /* --- TESTI SIDEBAR (Bianchi per contrasto su fondo scuro) --- */
         section[data-testid="stSidebar"] span, 
         section[data-testid="stSidebar"] p,
         section[data-testid="stSidebar"] label {
@@ -34,16 +34,25 @@ def apply_custom_design():
             font-size: 1.1rem !important;
         }
 
-        /* --- TITOLI E TESTI (BLU NOTARY) --- */
-        h1, h2, h3 {
-            font-family: 'Playfair Display', serif !important;
-            color: #1a2a6c !important;
+        /* --- TITOLI E TESTI CORPO CENTRALE (TUTTI IN BLU NOTARY) --- */
+        h1, h2, h3, h4, h5, h6, p, label, .stMarkdown, .testo-istruzioni {
+            font-family: 'Inter', sans-serif;
+            color: #1a2a6c !important; /* Forza il blu su ogni elemento di testo */
         }
         
-        .testo-istruzioni {
+        h1, h2, h3 {
+            font-family: 'Playfair Display', serif !important;
+        }
+
+        /* Correzione specifica per i titoli dei campi di input e file uploader */
+        .stTextInput label, .stFileUploader label, .stCheckbox label {
             color: #1a2a6c !important;
-            font-family: 'Inter', sans-serif;
-            font-size: 1.1rem;
+            font-weight: 600 !important;
+        }
+        
+        /* Testo all'interno dell'uploader */
+        .stFileUploader section {
+            color: #1a2a6c !important;
         }
 
         /* --- CARD CENTRALE PER IL FORM --- */
@@ -83,7 +92,7 @@ if 'blockchain' not in st.session_state:
 # 4. CONTENUTO PAGINA
 st.title("📄 Notarizzazione Digitale")
 st.markdown("""
-    <p class="testo-istruzioni">
+    <p style="color: #1a2a6c; font-size: 1.1rem;">
         Inserisci i dati del contratto e carica il file originale. 
         Il sistema genererà un <b>Hash SHA-256</b> univoco per garantire l'immutabilità nel tempo.
     </p>
@@ -114,11 +123,9 @@ with col_main:
         
         if submit:
             if titolo_atto and cf_contraente and file_pdf and certificazione:
-                # Logica Crittografica
                 file_bytes = file_pdf.getvalue()
                 impronta_hash = hashlib.sha256(file_bytes).hexdigest()
                 
-                # Creazione Blocco
                 nuovo_atto = {
                     "data": datetime.datetime.now().strftime("%d/%m/%Y %H:%M"),
                     "nome": titolo_atto,
@@ -127,7 +134,6 @@ with col_main:
                     "stato": "✅ Certificato"
                 }
                 
-                # Salvataggio
                 st.session_state.blockchain.append(nuovo_atto)
                 st.success("Operazione Completata! L'impronta digitale è stata registrata.")
                 st.balloons()
