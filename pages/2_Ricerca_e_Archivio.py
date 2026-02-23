@@ -8,7 +8,7 @@ st.set_page_config(
     layout="wide"
 )
 
-# 2. DESIGN COERENTE (WHITE & GOLD)
+# 2. DESIGN COERENTE LUXURY (WHITE & GOLD)
 def apply_custom_design():
     st.markdown("""
         <style>
@@ -16,7 +16,7 @@ def apply_custom_design():
         
         .stApp { background-color: #fdfdfd; }
 
-        /* SIDEBAR */
+        /* SIDEBAR SCURA */
         [data-testid="stSidebar"] {
             background-color: #0e1621 !important;
             border-right: 3px solid #b89333;
@@ -25,7 +25,7 @@ def apply_custom_design():
             color: #ffffff !important;
         }
 
-        /* TESTI */
+        /* TESTI BLU NOTARY */
         h1, h2, h3, h4, label, p, span {
             font-family: 'Inter', sans-serif !important;
             color: #1a2a6c !important;
@@ -42,29 +42,44 @@ def apply_custom_design():
             margin-bottom: 20px;
         }
 
-        /* INPUT NERO */
+        /* --- INPUT RICERCA: BIANCO, BORDO ORO, TESTO NERO --- */
         input { color: #000000 !important; }
         .stTextInput>div>div>input {
+            background-color: white !important;
             border: 2px solid #b89333 !important;
             border-radius: 10px !important;
+            color: #000000 !important;
+            font-weight: 500 !important;
+        }
+        
+        /* Focus effect */
+        .stTextInput>div>div>input:focus {
+            border-color: #1a2a6c !important;
+            box-shadow: 0 0 0 1px #1a2a6c !important;
         }
 
-        /* TABELLE */
-        .stDataFrame {
-            border: 1px solid #b89333 !important;
-            border-radius: 10px !important;
+        /* STILE PER GLI HASH (ORO) */
+        .hash-text {
+            color: #b89333;
+            font-family: monospace;
+            background: #fff9eb;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.85rem;
+            word-break: break-all;
         }
         </style>
     """, unsafe_allow_html=True)
 
 apply_custom_design()
 
-# 3. RECUPERO DATI
+# 3. RECUPERO DATI DALLA SESSIONE
 if 'blockchain' not in st.session_state:
     st.session_state.blockchain = []
 
+# 4. CONTENUTO PAGINA
 st.title("📜 Archivio Notarile")
-st.markdown('<p style="font-size: 1.1rem; color: #1a2a6c;">Consulta i documenti sigillati e verifica la loro integrità originale.</p>', unsafe_allow_html=True)
+st.markdown('<p style="font-size: 1.1rem; color: #1a2a6c;">Ricerca i documenti sigillati nel registro immutabile tramite identificativo.</p>', unsafe_allow_html=True)
 
 st.markdown("---")
 
@@ -72,14 +87,17 @@ st.markdown("---")
 col_filtro, col_vuota = st.columns([1, 2])
 with col_filtro:
     st.markdown('<div class="notary-card">', unsafe_allow_html=True)
-    search_query = st.text_input("🔍 Cerca per CF o P.IVA").upper()
+    st.subheader("🔍 Filtro di Ricerca")
+    search_query = st.text_input("Inserisci CF o P.IVA per filtrare").upper()
     st.markdown('</div>', unsafe_allow_html=True)
 
-# Visualizzazione Atti
+# Visualizzazione Risultati
+st.subheader("📑 Risultati Registro")
+
 if not st.session_state.blockchain:
-    st.info("L'archivio è attualmente vuoto. Notarizza il tuo primo atto nella pagina precedente.")
+    st.info("L'archivio è vuoto. Carica un atto nella pagina di Notarizzazione per vederlo apparire qui.")
 else:
-    # Filtriamo i dati in base alla ricerca
+    # Filtro logico
     atti_filtrati = [
         atto for atto in st.session_state.blockchain 
         if search_query in atto['identificativo'].upper() or not search_query
@@ -87,19 +105,23 @@ else:
 
     if atti_filtrati:
         for atto in atti_filtrati:
-            with st.container():
-                st.markdown(f"""
-                <div class="notary-card">
-                    <h3 style='margin-top:0;'>{atto['nome']}</h3>
-                    <p><b>Data:</b> {atto['data']} | <b>Soggetto:</b> {atto['identificativo']}</p>
-                    <code style='color: #b89333; font-size: 0.8rem;'>HASH: {atto['hash']}</code>
-                    <p style='color: green; font-weight: 600; margin-bottom:0;'>{atto['stato']}</p>
+            st.markdown(f"""
+            <div class="notary-card">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3 style='margin:0; color: #1a2a6c;'>{atto['nome']}</h3>
+                    <span style="color: #b89333; font-weight: bold;">{atto['data']}</span>
                 </div>
-                """, unsafe_allow_html=True)
+                <hr style="margin: 15px 0; border: 0; border-top: 1px solid #eee;">
+                <p><b>Soggetto Registrato:</b> {atto['identificativo']}</p>
+                <p><b>Impronta Digitale (Hash SHA-256):</b></p>
+                <div class="hash-text">{atto['hash']}</div>
+                <p style='color: #28a745; font-weight: 600; margin-top: 15px;'>{atto['stato']}</p>
+            </div>
+            """, unsafe_allow_html=True)
     else:
-        st.warning("Nessun atto trovato per i criteri inseriti.")
+        st.warning(f"Nessun atto trovato per: {search_query}")
 
-# Sidebar di stato
+# Sidebar informativa
 st.sidebar.markdown("---")
-st.sidebar.write(f"📊 **Statistiche:**")
-st.sidebar.write(f"Atti registrati: {len(st.session_state.blockchain)}")
+st.sidebar.write(f"💼 **Gestione Studio:**")
+st.sidebar.write(f"Totale atti in blockchain: **{len(st.session_state.blockchain)}**")
