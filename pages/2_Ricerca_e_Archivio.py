@@ -8,7 +8,7 @@ st.set_page_config(
     layout="wide"
 )
 
-# 2. DESIGN COORDINATO LUXURY (ULTRA FIX SOVRAPPOSIZIONE)
+# 2. DESIGN COORDINATO LUXURY (FIX POSIZIONAMENTO TESTO)
 def apply_custom_design():
     st.markdown("""
         <style>
@@ -38,10 +38,9 @@ def apply_custom_design():
             border: 1px solid #f1f1f1;
             box-shadow: 0 15px 35px rgba(0,0,0,0.05);
             margin-bottom: 20px;
-            position: relative;
         }
 
-        /* INPUT RICERCA (TOTAL WHITE) */
+        /* INPUT RICERCA TOTAL WHITE */
         .stTextInput input {
             background-color: white !important;
             color: black !important;
@@ -49,30 +48,42 @@ def apply_custom_design():
             border-radius: 10px !important;
         }
         
-        /* --- FIX RADICALE SOVRAPPOSIZIONE FILE UPLOADER --- */
+        /* --- POSIZIONAMENTO TESTO A DESTRA NELL'UPLOADER --- */
         [data-testid="stFileUploader"] section {
             background-color: white !important;
             border: 2px dashed #b89333 !important;
             border-radius: 12px !important;
-            padding: 30px !important;
+            padding: 15px 25px !important;
+            display: flex !important;
+            flex-direction: row !important; /* Allineamento orizzontale */
+            align-items: center !important;
+            justify-content: space-between !important; /* Spinge il testo a destra */
         }
         
-        /* Nasconde i testi "Drag and drop" e "Limit 200MB" che creano confusione */
-        [data-testid="stFileUploader"] section div div {
-            font-size: 0px !important;
-            color: bianco !important;
+        /* Stile per il testo istruzioni (Drag and drop) */
+        [data-testid="stFileUploader"] section > div:first-child {
+            order: 2 !important; /* Lo sposta a destra */
+            text-align: right !important;
+            font-size: 0.9rem !important;
+            color: #b89333 !important;
+            font-weight: 400 !important;
         }
-        
-        /* Fa riemergere solo il pulsante Browse */
+
+        /* Stile per il pulsante (Browse) */
         [data-testid="stFileUploader"] button {
+            order: 1 !important; /* Lo tiene a sinistra */
             background-color: white !important;
             color: #b89333 !important;
             border: 1px solid #b89333 !important;
-            font-size: 0.8rem !important;
-            margin-top: 10px !important;
+            margin: 0 !important;
         }
 
-        /* PULSANTI GENERALI */
+        /* Nasconde il limite dei MB per pulizia */
+        [data-testid="stFileUploader"] small {
+            display: none !important;
+        }
+
+        /* PULSANTI AZIONE */
         div.stButton > button, .stDownloadButton > button {
             background-color: white !important;
             color: #b89333 !important;
@@ -85,14 +96,9 @@ def apply_custom_design():
             color: white !important;
         }
 
-        /* PULSANTE ELIMINA */
         .btn-delete button {
             border: 1px solid #ff4b4b !important;
             color: #ff4b4b !important;
-        }
-        .btn-delete button:hover {
-            background-color: #ff4b4b !important;
-            color: white !important;
         }
 
         .hash-text {
@@ -119,8 +125,7 @@ st.markdown('<p style="font-size: 1.1rem; color: #1a2a6c;">Gestione e validazion
 # --- VERIFICA ORIGINALITÀ ---
 with st.expander("🛡️ Verifica Integrità Documento"):
     st.markdown('<div class="notary-card">', unsafe_allow_html=True)
-    st.write("Trascina un file per confrontarlo con il registro:")
-    file_da_verificare = st.file_uploader("", type=["pdf"], key="verify_upload", label_visibility="collapsed")
+    file_da_verificare = st.file_uploader("Trascina qui il file PDF per la verifica rapida —>", type=["pdf"], key="verify_upload", label_visibility="collapsed")
     if file_da_verificare:
         hash_check = hashlib.sha256(file_da_verificare.getvalue()).hexdigest()
         match = next((x for x in st.session_state.blockchain if x['hash'] == hash_check), None)
@@ -153,7 +158,6 @@ else:
     atti_filtrati = [atto for atto in st.session_state.blockchain if query_effettiva in atto['identificativo'].upper() or not query_effettiva]
 
     for i, atto in enumerate(atti_filtrati):
-        # Card contenitore
         with st.container():
             st.markdown(f"""
             <div class="notary-card">
@@ -165,10 +169,10 @@ else:
                 <div class="hash-text">{atto['hash']}</div>
             """, unsafe_allow_html=True)
             
-            # Posizionamento pulsanti in fondo a destra
+            # Pulsanti allineati a destra
             c_vuota, c_btn1, c_btn2 = st.columns([2.5, 0.8, 0.7])
             with c_btn1:
-                cert_content = f"CERTIFICATO NOTARILE\n\nAtto: {atto['nome']}\nData: {atto['data']}\nID: {atto['identificativo']}\nHash: {atto['hash']}"
+                cert_content = f"CERTIFICATO NOTARILE\nAtto: {atto['nome']}\nID: {atto['identificativo']}\nHash: {atto['hash']}"
                 st.download_button("📄 SCARICA", cert_content, file_name=f"Certificato_{i}.txt", key=f"dl_{i}")
             with c_btn2:
                 st.markdown('<div class="btn-delete">', unsafe_allow_html=True)
