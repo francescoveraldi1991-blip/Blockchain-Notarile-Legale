@@ -7,7 +7,7 @@ st.set_page_config(
     layout="wide"
 )
 
-# 2. DESIGN POTENZIATO (ALTO CONTRASTO)
+# 2. DESIGN POTENZIATO (ALTO CONTRASTO E COLORI COORDINATI)
 def apply_custom_design():
     st.markdown("""
         <style>
@@ -20,38 +20,31 @@ def apply_custom_design():
 
         /* --- SIDEBAR SCURA PROFESSIONALE --- */
         [data-testid="stSidebar"] {
-            background-color: #0e1621 !important; /* Blu Notte Scurissimo */
-            border-right: 3px solid #b89333; /* Separatore Oro */
+            background-color: #0e1621 !important;
+            border-right: 3px solid #b89333;
         }
 
-        /* --- TESTI SIDEBAR (Bianco Puro per Leggibilità) --- */
-        section[data-testid="stSidebar"] .css-17l243g, 
+        /* --- TESTI SIDEBAR --- */
         section[data-testid="stSidebar"] span, 
         section[data-testid="stSidebar"] p,
-        section[data-testid="stSidebar"] label,
-        section[data-testid="stSidebar"] li {
+        section[data-testid="stSidebar"] label {
             color: #ffffff !important;
             font-size: 1.1rem !important;
-            font-weight: 500 !important;
         }
 
-        /* --- TITOLI SIDEBAR --- */
-        section[data-testid="stSidebar"] h1, 
-        section[data-testid="stSidebar"] h2, 
-        section[data-testid="stSidebar"] h3 {
-            color: #b89333 !important;
-            padding-bottom: 10px;
-        }
-
-        /* --- CORPO CENTRALE --- */
-        html, body, [class*="css"] {
-            font-family: 'Inter', sans-serif;
-            color: #0e1621;
-        }
-        
+        /* --- TITOLI E TESTO INTRODUTTIVO (BLU NOTARY) --- */
         h1, h2, h3 {
             font-family: 'Playfair Display', serif !important;
             color: #1a2a6c !important;
+        }
+
+        /* Testo di benvenuto personalizzato in Blu */
+        .testo-introduzione {
+            font-family: 'Inter', sans-serif;
+            color: #1a2a6c !important;
+            font-size: 1.25rem;
+            line-height: 1.6;
+            font-weight: 400;
         }
 
         /* --- PULSANTE LUXURY --- */
@@ -62,20 +55,16 @@ def apply_custom_design():
             border: none;
             padding: 15px 30px;
             font-weight: 600;
-            font-size: 1.1rem;
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            transition: all 0.3s ease;
         }
         
         div.stButton > button:hover {
             transform: translateY(-3px);
             box-shadow: 0 6px 20px rgba(184, 147, 51, 0.4);
-            color: #ffffff !important;
         }
         </style>
     """, unsafe_allow_html=True)
 
-# Applichiamo lo stile
 apply_custom_design()
 
 # 3. INIZIALIZZAZIONE BLOCKCHAIN
@@ -90,25 +79,26 @@ col1, col2 = st.columns([2, 1], gap="large")
 
 with col1:
     st.markdown("## Sicurezza. Trasparenza. Futuro.")
-    st.write("""
-        Benvenuti nell'ecosistema **NotaryChain**. 
-        La nostra tecnologia trasforma il concetto di 'Data Certa' in uno standard 
-        digitale immutabile, proteggendo la proprietà intellettuale e le 
-        volontà testamentarie con crittografia di grado militare.
-    """)
+    
+    # --- TESTO MODIFICATO IN BLU ---
+    st.markdown("""
+        <p class="testo-introduzione">
+            Benvenuti nell'ecosistema <b>NotaryChain</b>. <br>
+            La nostra tecnologia trasforma il concetto di 'Data Certa' in uno standard 
+            digitale immutabile, proteggendo la proprietà intellettuale e le 
+            volontà testamentarie con crittografia di grado militare.
+        </p>
+    """, unsafe_allow_html=True)
     
     st.markdown("<br>", unsafe_allow_html=True)
     
-    # --- PULSANTE DI NAVIGAZIONE ---
     if st.button("ENTRA NELLA BLOCKCHAIN LEGALE"):
         try:
-            # Assicurati che il file si chiami 'notarizzazione.py' in 'pages/'
             st.switch_page("pages/notarizzazione.py")
         except:
             st.error("⚠️ Errore: Il file 'notarizzazione.py' non è stato trovato nella cartella 'pages'.")
 
 with col2:
-    # Immagine istituzionale
     st.markdown("![Legal Icon](https://img.icons8.com/ios-filled/150/1a2a6c/law.png)")
 
 st.markdown("---")
