@@ -9,53 +9,47 @@ st.set_page_config(
     layout="wide"
 )
 
-# 2. DESIGN COORDINATO (TUTTI I TESTI IN BLU)
+# 2. DESIGN COORDINATO E POTENZIATO
 def apply_custom_design():
     st.markdown("""
         <style>
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@300;400;600&display=swap');
         
         /* --- SFONDO E CORPO --- */
-        .stApp {
-            background-color: #fdfdfd;
-        }
+        .stApp { background-color: #fdfdfd; }
 
         /* --- SIDEBAR SCURA PROFESSIONALE --- */
         [data-testid="stSidebar"] {
             background-color: #0e1621 !important;
             border-right: 3px solid #b89333;
         }
-
-        /* --- TESTI SIDEBAR (Bianchi per contrasto su fondo scuro) --- */
         section[data-testid="stSidebar"] span, 
         section[data-testid="stSidebar"] p,
         section[data-testid="stSidebar"] label {
             color: #ffffff !important;
-            font-size: 1.1rem !important;
         }
 
-        /* --- TITOLI E TESTI CORPO CENTRALE (TUTTI IN BLU NOTARY) --- */
-        h1, h2, h3, h4, h5, h6, p, label, .stMarkdown, .testo-istruzioni {
+        /* --- TESTI BLU NOTARY --- */
+        h1, h2, h3, h4, label, .stMarkdown, p {
             font-family: 'Inter', sans-serif;
-            color: #1a2a6c !important; /* Forza il blu su ogni elemento di testo */
-        }
-        
-        h1, h2, h3 {
-            font-family: 'Playfair Display', serif !important;
-        }
-
-        /* Correzione specifica per i titoli dei campi di input e file uploader */
-        .stTextInput label, .stFileUploader label, .stCheckbox label {
-            color: #1a2a6c !important;
-            font-weight: 600 !important;
-        }
-        
-        /* Testo all'interno dell'uploader */
-        .stFileUploader section {
             color: #1a2a6c !important;
         }
+        h1, h2, h3 { font-family: 'Playfair Display', serif !important; }
 
-        /* --- CARD CENTRALE PER IL FORM --- */
+        /* --- INPUT FIELDS: BIANCHI CON BORDO ORO --- */
+        .stTextInput>div>div>input, .stFileUploader section {
+            background-color: white !important;
+            border: 2px solid #b89333 !important; /* Bordo Oro */
+            border-radius: 10px !important;
+            color: #1a2a6c !important;
+        }
+        
+        /* Focus sugli input */
+        .stTextInput>div>div>input:focus {
+            box-shadow: 0 0 10px rgba(184, 147, 51, 0.3) !important;
+        }
+
+        /* --- CARD CENTRALE --- */
         .notary-card {
             background: white;
             padding: 35px;
@@ -65,47 +59,40 @@ def apply_custom_design():
             margin-top: 20px;
         }
 
-        /* --- PULSANTE LUXURY --- */
+        /* --- PULSANTE GRADIENTE (COERENTE CON HOME) --- */
         div.stButton > button {
-            background: linear-gradient(135deg, #1a2a6c 0%, #b89333 100%);
+            background: linear-gradient(135deg, #1a2a6c 0%, #b89333 100%) !important;
             color: white !important;
-            border-radius: 12px;
-            border: none;
-            padding: 12px 30px;
-            font-weight: 600;
+            border-radius: 12px !important;
+            border: none !important;
+            padding: 15px 30px !important;
+            font-weight: 600 !important;
             width: 100%;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
         }
-        
         div.stButton > button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(184, 147, 51, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(184, 147, 51, 0.4);
         }
         </style>
     """, unsafe_allow_html=True)
 
 apply_custom_design()
 
-# 3. RECUPERO DATI BLOCKCHAIN
 if 'blockchain' not in st.session_state:
     st.session_state.blockchain = []
 
 # 4. CONTENUTO PAGINA
 st.title("📄 Notarizzazione Digitale")
-st.markdown("""
-    <p style="color: #1a2a6c; font-size: 1.1rem;">
-        Inserisci i dati del contratto e carica il file originale. 
-        Il sistema genererà un <b>Hash SHA-256</b> univoco per garantire l'immutabilità nel tempo.
-    </p>
-""", unsafe_allow_html=True)
+st.markdown('<p style="font-size: 1.1rem;">Inserisci i dati dell\'atto e sigillali in modo immutabile.</p>', unsafe_allow_html=True)
 
 st.markdown("---")
 
-# Layout centrato per il modulo
 col_sx, col_main, col_dx = st.columns([1, 2, 1])
 
 with col_main:
     st.markdown('<div class="notary-card">', unsafe_allow_html=True)
-    
     with st.form("form_notarizzazione", clear_on_submit=True):
         st.subheader("📝 Dettagli del Documento")
         
@@ -113,11 +100,11 @@ with col_main:
         cf_contraente = st.text_input("Codice Fiscale Parte Principale").upper()
         
         st.markdown("<br>", unsafe_allow_html=True)
-        st.subheader("📂 File da Certificare")
+        st.subheader("📂 Caricamento Documento")
         file_pdf = st.file_uploader("Trascina qui il file PDF dell'atto", type=["pdf"])
         
         st.markdown("<br>", unsafe_allow_html=True)
-        certificazione = st.checkbox("Confermo che il file caricato è la versione definitiva dell'atto.")
+        certificazione = st.checkbox("Confermo l'integrità del documento.")
         
         submit = st.form_submit_button("SIGILLA ATTO NELLA BLOCKCHAIN")
         
@@ -133,16 +120,13 @@ with col_main:
                     "hash": impronta_hash,
                     "stato": "✅ Certificato"
                 }
-                
                 st.session_state.blockchain.append(nuovo_atto)
-                st.success("Operazione Completata! L'impronta digitale è stata registrata.")
+                st.success("✅ Atto registrato con successo!")
                 st.balloons()
             else:
-                st.error("Per favore, compila tutti i campi e accetta la conferma.")
-                
+                st.error("Per favore, compila tutti i campi.")
     st.markdown('</div>', unsafe_allow_html=True)
 
-# 5. FOOTER SIDEBAR
 st.sidebar.markdown("---")
-st.sidebar.write("🔒 **Stato Connessione:**")
+st.sidebar.write("🔒 **Sicurezza:**")
 st.sidebar.success("Blockchain Core Attiva")
