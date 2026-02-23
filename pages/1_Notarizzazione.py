@@ -2,93 +2,141 @@ import streamlit as st
 import hashlib
 import datetime
 
-# --- CONFIGURAZIONE E DESIGN (Uguale alla Home) ---
-st.set_page_config(page_title="NotaryChain - Contratti", page_icon="⚖️", layout="wide")
+# 1. CONFIGURAZIONE PAGINA
+st.set_page_config(
+    page_title="Notarizzazione - NotaryChain Pro",
+    page_icon="⚖️",
+    layout="wide"
+)
 
+# 2. DESIGN COORDINATO (SIDEBAR SCURA + TESTI BLU)
 def apply_custom_design():
     st.markdown("""
         <style>
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@300;400;600&display=swap');
-        html, body, [class*="css"] { font-family: 'Inter', sans-serif; color: #2c3e50; }
-        h1, h2, h3 { font-family: 'Playfair Display', serif !important; color: #1a2a6c; }
         
-        /* Box Stile Card Bianca */
-        .notary-card {
-            background-color: white;
-            padding: 25px;
-            border-radius: 15px;
-            border: 1px solid #e0e0e0;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            margin-bottom: 20px;
+        /* --- SFONDO E CORPO --- */
+        .stApp {
+            background-color: #fdfdfd;
         }
 
-        /* Pulsante Blu/Oro */
-        div.stButton > button {
-            background-color: #1a2a6c;
-            color: white;
-            border-radius: 8px;
-            width: 100%;
-            height: 50px;
-            font-weight: 600;
+        /* --- SIDEBAR SCURA PROFESSIONALE (Coerente con Home) --- */
+        [data-testid="stSidebar"] {
+            background-color: #0e1621 !important;
+            border-right: 3px solid #b89333;
         }
-        div.stButton > button:hover {
-            background-color: #b89333;
+
+        /* --- TESTI SIDEBAR --- */
+        section[data-testid="stSidebar"] span, 
+        section[data-testid="stSidebar"] p,
+        section[data-testid="stSidebar"] label {
+            color: #ffffff !important;
+            font-size: 1.1rem !important;
+        }
+
+        /* --- TITOLI E TESTI (BLU NOTARY) --- */
+        h1, h2, h3 {
+            font-family: 'Playfair Display', serif !important;
+            color: #1a2a6c !important;
+        }
+        
+        .testo-istruzioni {
+            color: #1a2a6c !important;
+            font-family: 'Inter', sans-serif;
+            font-size: 1.1rem;
+        }
+
+        /* --- CARD CENTRALE PER IL FORM --- */
+        .notary-card {
+            background: white;
+            padding: 35px;
+            border-radius: 20px;
+            border: 1px solid #eee;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            margin-top: 20px;
+        }
+
+        /* --- PULSANTE LUXURY --- */
+        div.stButton > button {
+            background: linear-gradient(135deg, #1a2a6c 0%, #b89333 100%);
+            color: white !important;
+            border-radius: 12px;
             border: none;
+            padding: 12px 30px;
+            font-weight: 600;
+            width: 100%;
+        }
+        
+        div.stButton > button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(184, 147, 51, 0.3);
         }
         </style>
     """, unsafe_allow_html=True)
 
 apply_custom_design()
 
-# Recupero dati (per non perderli passando da una pagina all'altra)
+# 3. RECUPERO DATI BLOCKCHAIN
 if 'blockchain' not in st.session_state:
     st.session_state.blockchain = []
 
-# --- CONTENUTO PAGINA ---
-st.title("📄 Notarizzazione Contratti")
-st.write("Inserisci i dettagli del contratto per generare l'impronta digitale immutabile.")
+# 4. CONTENUTO PAGINA
+st.title("📄 Notarizzazione Digitale")
+st.markdown("""
+    <p class="testo-istruzioni">
+        Inserisci i dati del contratto e carica il file originale. 
+        Il sistema genererà un <b>Hash SHA-256</b> univoco per garantire l'immutabilità nel tempo.
+    </p>
+""", unsafe_allow_html=True)
 
-# Creiamo una colonna centrale per un look pulito
-col_sx, col_cent, col_dx = st.columns([1, 2, 1])
+st.markdown("---")
 
-with col_cent:
+# Layout centrato per il modulo
+col_sx, col_main, col_dx = st.columns([1, 2, 1])
+
+with col_main:
     st.markdown('<div class="notary-card">', unsafe_allow_html=True)
     
-    with st.form("form_contratto", clear_on_submit=True):
-        st.subheader("Nuovo Inserimento")
-        titolo = st.text_input("Titolo del Contratto / Repertorio")
+    with st.form("form_notarizzazione", clear_on_submit=True):
+        st.subheader("📝 Dettagli del Documento")
+        
+        titolo_atto = st.text_input("Titolo dell'Atto / Identificativo")
         cf_contraente = st.text_input("Codice Fiscale Parte Principale").upper()
-        file_pdf = st.file_uploader("Carica l'Atto in PDF", type=["pdf"])
         
-        st.markdown("---")
-        consenso = st.checkbox("Certifico l'integrità del documento e l'identità delle parti.")
+        st.markdown("<br>", unsafe_allow_html=True)
+        st.subheader("📂 File da Certificare")
+        file_pdf = st.file_uploader("Trascina qui il file PDF dell'atto", type=["pdf"])
         
-        submit = st.form_submit_button("SIGILLA NELLA BLOCKCHAIN")
+        st.markdown("<br>", unsafe_allow_html=True)
+        certificazione = st.checkbox("Confermo che il file caricato è la versione definitiva dell'atto.")
+        
+        submit = st.form_submit_button("SIGILLA ATTO NELLA BLOCKCHAIN")
         
         if submit:
-            if titolo and cf_contraente and file_pdf and consenso:
-                # Calcolo Hash
+            if titolo_atto and cf_contraente and file_pdf and certificazione:
+                # Logica Crittografica
                 file_bytes = file_pdf.getvalue()
-                impronta = hashlib.sha256(file_bytes).hexdigest()
+                impronta_hash = hashlib.sha256(file_bytes).hexdigest()
                 
-                # Registrazione
-                nuovo_blocco = {
+                # Creazione Blocco
+                nuovo_atto = {
                     "data": datetime.datetime.now().strftime("%d/%m/%Y %H:%M"),
-                    "nome": titolo,
+                    "nome": titolo_atto,
                     "cf": cf_contraente,
-                    "hash": impronta,
-                    "tipo": "Contratto",
+                    "hash": impronta_hash,
                     "stato": "✅ Certificato"
                 }
-                st.session_state.blockchain.append(nuovo_blocco)
-                st.success("Contratto Notarizzato con Successo!")
+                
+                # Salvataggio
+                st.session_state.blockchain.append(nuovo_atto)
+                st.success("Operazione Completata! L'impronta digitale è stata registrata.")
                 st.balloons()
             else:
-                st.error("Tutti i campi sono obbligatori per la validità legale.")
+                st.error("Per favore, compila tutti i campi e accetta la conferma.")
                 
     st.markdown('</div>', unsafe_allow_html=True)
 
-# Menu laterale automatico
+# 5. FOOTER SIDEBAR
 st.sidebar.markdown("---")
-st.sidebar.image("https://img.icons8.com/ios-filled/50/1a2a6c/law.png")
-st.sidebar.write("**NotaryChain Pro** v4.5")
+st.sidebar.write("🔒 **Stato Connessione:**")
+st.sidebar.success("Blockchain Core Attiva")
