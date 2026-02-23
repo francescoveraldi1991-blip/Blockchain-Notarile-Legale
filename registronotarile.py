@@ -46,7 +46,7 @@ def apply_custom_design():
         /* --- CORPO CENTRALE --- */
         html, body, [class*="css"] {
             font-family: 'Inter', sans-serif;
-            color: #1c1c1c;
+            color: #b89333;
         }
         
         h1, h2, h3 {
