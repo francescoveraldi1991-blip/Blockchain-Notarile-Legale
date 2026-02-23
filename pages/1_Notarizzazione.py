@@ -9,7 +9,7 @@ st.set_page_config(
     layout="wide"
 )
 
-# 2. DESIGN LUXURY CON CORREZIONI MIRATE
+# 2. DESIGN LUXURY CON INPUT NERO
 def apply_custom_design():
     st.markdown("""
         <style>
@@ -27,14 +27,14 @@ def apply_custom_design():
             color: #ffffff !important;
         }
 
-        /* --- TESTI BLU NOTARY --- */
+        /* --- TESTI BLU NOTARY (Titoli e Label) --- */
         h1, h2, h3, h4, label, p, span {
             font-family: 'Inter', sans-serif !important;
             color: #1a2a6c !important;
         }
         h1, h2, h3 { font-family: 'Playfair Display', serif !important; }
 
-        /* --- RIMOZIONE TOTALE CORNICE STREAMLIT (IL RETTANGOLO) --- */
+        /* --- RIMOZIONE CORNICE STREAMLIT --- */
         [data-testid="stForm"], .stForm {
             border: none !important;
             padding: 0 !important;
@@ -50,17 +50,19 @@ def apply_custom_design():
             box-shadow: 0 15px 35px rgba(0,0,0,0.05);
         }
 
-        /* --- INPUT FIELDS --- */
+        /* --- INPUT FIELDS: TESTO SCRITTO DALL'UTENTE IN NERO --- */
         .stTextInput>div>div>input {
             background-color: white !important;
             border: 2px solid #b89333 !important;
             border-radius: 10px !important;
+            color: #000000 !important; /* TESTO IN NERO */
+            font-weight: 500 !important;
         }
 
         /* --- PULSANTE BROWSE PICCOLO --- */
         [data-testid="stFileUploader"] section {
             background-color: white !important;
-            border: 2px dashed #b89333 !important; /* Effetto tratteggiato elegante */
+            border: 2px dashed #b89333 !important;
             border-radius: 12px !important;
             padding: 10px !important;
         }
@@ -70,13 +72,13 @@ def apply_custom_design():
             color: #b89333 !important;
             border: 1px solid #b89333 !important;
             border-radius: 8px !important;
-            padding: 5px 15px !important; /* Ridotto */
-            font-size: 0.8rem !important; /* Testo più piccolo */
-            width: auto !important; /* Non occupa tutto lo spazio */
+            padding: 5px 15px !important;
+            font-size: 0.8rem !important;
+            width: auto !important;
             text-transform: none !important;
         }
 
-        /* --- PULSANTE SIGILLA (GRANDE E UGUALE ALLA HOME) --- */
+        /* --- PULSANTE SIGILLA (BIANCO E ORO) --- */
         div.stButton > button {
             background-color: white !important;
             color: #b89333 !important;
@@ -88,7 +90,6 @@ def apply_custom_design():
             font-size: 1.1rem !important;
             width: 100% !important;
             transition: all 0.3s ease !important;
-            box-shadow: 0 4px 10px rgba(184, 147, 51, 0.1) !important;
         }
         
         div.stButton > button:hover {
@@ -111,7 +112,6 @@ st.markdown("---")
 col_sx, col_main, col_dx = st.columns([1, 2, 1])
 
 with col_main:
-    # Apro la card personalizzata
     st.markdown('<div class="notary-card">', unsafe_allow_html=True)
     
     with st.form("form_notarizzazione", clear_on_submit=True):
@@ -124,26 +124,4 @@ with col_main:
         file_pdf = st.file_uploader("Carica il PDF", type=["pdf"], label_visibility="collapsed")
         
         st.markdown("<br>", unsafe_allow_html=True)
-        certificazione = st.checkbox("Confermo l'integrità del documento.")
-        
-        submit = st.form_submit_button("SIGILLA ATTO NELLA BLOCKCHAIN")
-        
-        if submit:
-            if titolo_atto and cf_contraente and file_pdf and certificazione:
-                file_bytes = file_pdf.getvalue()
-                impronta_hash = hashlib.sha256(file_bytes).hexdigest()
-                nuovo_atto = {
-                    "data": datetime.datetime.now().strftime("%d/%m/%Y %H:%M"),
-                    "nome": titolo_atto, "cf": cf_contraente, "hash": impronta_hash, "stato": "✅ Certificato"
-                }
-                st.session_state.blockchain.append(nuovo_atto)
-                st.success("✅ Atto registrato con successo!")
-                st.balloons()
-            else:
-                st.error("Per favore, compila tutti i campi.")
-                
-    st.markdown('</div>', unsafe_allow_html=True) # Chiudo la card
-
-st.sidebar.markdown("---")
-st.sidebar.write("🔒 **Sicurezza:**")
-st.sidebar.success("Blockchain Core Attiva")
+        certificazione
