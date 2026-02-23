@@ -9,7 +9,7 @@ st.set_page_config(
     layout="wide"
 )
 
-# 2. DESIGN LUXURY (INPUT NERO + RIMOZIONE CORNICI)
+# 2. DESIGN LUXURY
 def apply_custom_design():
     st.markdown("""
         <style>
@@ -49,10 +49,8 @@ def apply_custom_design():
             box-shadow: 0 15px 35px rgba(0,0,0,0.05);
         }
 
-        /* INPUT FIELDS: FORZATURA TESTO NERO */
-        input {
-            color: #000000 !important;
-        }
+        /* INPUT FIELDS: TESTO NERO */
+        input { color: #000000 !important; }
         .stTextInput>div>div>input {
             background-color: white !important;
             border: 2px solid #b89333 !important;
@@ -66,17 +64,13 @@ def apply_custom_design():
             background-color: white !important;
             border: 2px dashed #b89333 !important;
             border-radius: 12px !important;
-            padding: 10px !important;
         }
-        
         [data-testid="stFileUploader"] button {
             background-color: white !important;
             color: #b89333 !important;
             border: 1px solid #b89333 !important;
             border-radius: 8px !important;
-            padding: 5px 15px !important;
             font-size: 0.8rem !important;
-            width: auto !important;
         }
 
         /* PULSANTE SIGILLA */
@@ -87,11 +81,9 @@ def apply_custom_design():
             border-radius: 12px !important;
             padding: 15px 30px !important;
             font-weight: 600 !important;
-            font-size: 1.1rem !important;
             width: 100% !important;
             transition: all 0.3s ease !important;
         }
-        
         div.stButton > button:hover {
             background-color: #b89333 !important;
             color: white !important;
@@ -101,7 +93,6 @@ def apply_custom_design():
 
 apply_custom_design()
 
-# 3. LOGICA SESSIONE
 if 'blockchain' not in st.session_state:
     st.session_state.blockchain = []
 
@@ -115,7 +106,6 @@ col_sx, col_main, col_dx = st.columns([1, 2, 1])
 with col_main:
     st.markdown('<div class="notary-card">', unsafe_allow_html=True)
     
-    # Creiamo il form
     with st.form("form_notarizzazione", clear_on_submit=True):
         st.subheader("📝 Dettagli del Documento")
         titolo_atto = st.text_input("Titolo dell'Atto / Identificativo")
@@ -126,14 +116,18 @@ with col_main:
         file_pdf = st.file_uploader("Carica il PDF", type=["pdf"], label_visibility="collapsed")
         
         st.markdown("<br>", unsafe_allow_html=True)
-        # Variabile certificazione definita dentro il form
-        certificato_check = st.checkbox("Confermo l'integrità del documento.")
+        st.subheader("⚖️ Dichiarazioni di Responsabilità")
         
+        # Le tre checkbox richieste
+        check_integrita = st.checkbox("Confermo l'integrità e la paternità del documento.")
+        check_identita = st.checkbox("Dichiaro di essermi accertato dell'identità personale di tutte le parti.")
+        check_poteri = st.checkbox("Dichiaro di aver verificato i relativi poteri di rappresentanza (per le società).")
+        
+        st.markdown("<br>", unsafe_allow_html=True)
         submit = st.form_submit_button("SIGILLA ATTO NELLA BLOCKCHAIN")
         
         if submit:
-            # Controllo rigoroso di tutte le variabili
-            if titolo_atto and cf_contraente and file_pdf and certificato_check:
+            if titolo_atto and cf_contraente and file_pdf and check_integrita and check_identita and check_poteri:
                 file_bytes = file_pdf.getvalue()
                 impronta_hash = hashlib.sha256(file_bytes).hexdigest()
                 
@@ -148,7 +142,7 @@ with col_main:
                 st.success("✅ Atto registrato con successo!")
                 st.balloons()
             else:
-                st.error("Errore: Assicurati di aver compilato i testi, caricato il file e spuntato la conferma.")
+                st.error("⚠️ Attenzione: Tutti i campi e le dichiarazioni di responsabilità sono obbligatori per procedere.")
                 
     st.markdown('</div>', unsafe_allow_html=True)
 
