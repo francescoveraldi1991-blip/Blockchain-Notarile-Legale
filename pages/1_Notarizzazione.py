@@ -70,18 +70,10 @@ def apply_custom_design():
 
         /* --- PULSANTE SIGILLA (SINCRONIZZATO AL 100% CON LA HOME) --- */
         div.stButton > button {
-            background: linear-gradient(135deg, #1a2a6c 0%, #b89333 100%) !important;
-            color: white !important;
-            border-radius: 12px !important;
-            border: none !important;
-            padding: 15px 30px !important;
-            font-family: 'Inter', sans-serif !important;
+            background-color: white !important;
+            color: #b89333 !important;
+            border: 1px solid #b89333 !important;
             font-weight: 600 !important;
-            font-size: 1.1rem !important;
-            width: 100%;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important;
-            transition: all 0.3s ease !important;
-            text-transform: none !important;
         }
         
         div.stButton > button:hover {
