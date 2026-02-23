@@ -30,7 +30,7 @@ def apply_custom_design():
         }
 
         /* --- TESTI BLU NOTARY --- */
-        h1, h2, h3, h4, label, .stMarkdown, p {
+        h1, h2, h3, h4, label, .stMarkdown, p, span {
             font-family: 'Inter', sans-serif !important;
             color: #1a2a6c !important;
         }
@@ -44,11 +44,18 @@ def apply_custom_design():
             border-radius: 12px !important;
             color: #1a2a6c !important;
         }
-        
-        /* Testo dentro l'uploader */
-        [data-testid="stFileUploader"] section div div span {
+
+        /* FORZATURA PULSANTE "BROWSE FILES" (Quello che vedevi scuro) */
+        [data-testid="stFileUploader"] button {
+            background-color: white !important;
+            color: #b89333 !important;
+            border: 1px solid #b89333 !important;
+            font-weight: 600 !important;
+        }
+        [data-testid="stFileUploader"] button:hover {
+            background-color: #fcf8ee !important;
+            border-color: #1a2a6c !important;
             color: #1a2a6c !important;
-            font-weight: 400;
         }
 
         /* --- CARD CENTRALE --- */
@@ -61,7 +68,7 @@ def apply_custom_design():
             margin-top: 20px;
         }
 
-        /* --- PULSANTE SINCRONIZZATO CON LA HOME --- */
+        /* --- PULSANTE SIGILLA (SINCRONIZZATO AL 100% CON LA HOME) --- */
         div.stButton > button {
             background: linear-gradient(135deg, #1a2a6c 0%, #b89333 100%) !important;
             color: white !important;
@@ -74,13 +81,18 @@ def apply_custom_design():
             width: 100%;
             box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important;
             transition: all 0.3s ease !important;
-            text-transform: none !important; /* Mantiene il testo come scritto */
+            text-transform: none !important;
         }
         
         div.stButton > button:hover {
             transform: translateY(-3px) !important;
             box-shadow: 0 6px 20px rgba(184, 147, 51, 0.4) !important;
             color: #ffffff !important;
+        }
+
+        /* Rimuoviamo eventuali bordi scuri residui di Streamlit */
+        div[data-baseweb="input"] {
+            border: none !important;
         }
         </style>
     """, unsafe_allow_html=True)
