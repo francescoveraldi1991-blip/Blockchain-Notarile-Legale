@@ -9,7 +9,7 @@ st.set_page_config(
     layout="wide"
 )
 
-# 2. DESIGN COORDINATO E POTENZIATO
+# 2. DESIGN COORDINATO, POTENZIATO E SINCRONIZZATO
 def apply_custom_design():
     st.markdown("""
         <style>
@@ -31,22 +31,24 @@ def apply_custom_design():
 
         /* --- TESTI BLU NOTARY --- */
         h1, h2, h3, h4, label, .stMarkdown, p {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Inter', sans-serif !important;
             color: #1a2a6c !important;
         }
         h1, h2, h3 { font-family: 'Playfair Display', serif !important; }
 
-        /* --- INPUT FIELDS: BIANCHI CON BORDO ORO --- */
-        .stTextInput>div>div>input, .stFileUploader section {
+        /* --- INPUT FIELDS & FILE UPLOADER: BIANCHI CON BORDO ORO --- */
+        .stTextInput>div>div>input, 
+        [data-testid="stFileUploader"] section {
             background-color: white !important;
-            border: 2px solid #b89333 !important; /* Bordo Oro */
-            border-radius: 10px !important;
+            border: 2px solid #b89333 !important;
+            border-radius: 12px !important;
             color: #1a2a6c !important;
         }
         
-        /* Focus sugli input */
-        .stTextInput>div>div>input:focus {
-            box-shadow: 0 0 10px rgba(184, 147, 51, 0.3) !important;
+        /* Testo dentro l'uploader */
+        [data-testid="stFileUploader"] section div div span {
+            color: #1a2a6c !important;
+            font-weight: 400;
         }
 
         /* --- CARD CENTRALE --- */
@@ -59,33 +61,39 @@ def apply_custom_design():
             margin-top: 20px;
         }
 
-        /* --- PULSANTE GRADIENTE (COERENTE CON HOME) --- */
+        /* --- PULSANTE SINCRONIZZATO CON LA HOME --- */
         div.stButton > button {
             background: linear-gradient(135deg, #1a2a6c 0%, #b89333 100%) !important;
             color: white !important;
             border-radius: 12px !important;
             border: none !important;
             padding: 15px 30px !important;
+            font-family: 'Inter', sans-serif !important;
             font-weight: 600 !important;
+            font-size: 1.1rem !important;
             width: 100%;
-            transition: all 0.3s ease;
-            font-size: 1.1rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important;
+            transition: all 0.3s ease !important;
+            text-transform: none !important; /* Mantiene il testo come scritto */
         }
+        
         div.stButton > button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(184, 147, 51, 0.4);
+            transform: translateY(-3px) !important;
+            box-shadow: 0 6px 20px rgba(184, 147, 51, 0.4) !important;
+            color: #ffffff !important;
         }
         </style>
     """, unsafe_allow_html=True)
 
 apply_custom_design()
 
+# 3. LOGICA BLOCKCHAIN
 if 'blockchain' not in st.session_state:
     st.session_state.blockchain = []
 
 # 4. CONTENUTO PAGINA
 st.title("📄 Notarizzazione Digitale")
-st.markdown('<p style="font-size: 1.1rem;">Inserisci i dati dell\'atto e sigillali in modo immutabile.</p>', unsafe_allow_html=True)
+st.markdown('<p style="font-size: 1.1rem; color: #1a2a6c;">Inserisci i dati dell\'atto e sigillali in modo immutabile.</p>', unsafe_allow_html=True)
 
 st.markdown("---")
 
@@ -104,7 +112,7 @@ with col_main:
         file_pdf = st.file_uploader("Trascina qui il file PDF dell'atto", type=["pdf"])
         
         st.markdown("<br>", unsafe_allow_html=True)
-        certificazione = st.checkbox("Confermo l'integrità del documento.")
+        certificazione = st.checkbox("Confermo l'integrità e la paternità del documento.")
         
         submit = st.form_submit_button("SIGILLA ATTO NELLA BLOCKCHAIN")
         
@@ -124,7 +132,7 @@ with col_main:
                 st.success("✅ Atto registrato con successo!")
                 st.balloons()
             else:
-                st.error("Per favore, compila tutti i campi.")
+                st.error("Per favore, compila tutti i campi prima di procedere.")
     st.markdown('</div>', unsafe_allow_html=True)
 
 st.sidebar.markdown("---")
