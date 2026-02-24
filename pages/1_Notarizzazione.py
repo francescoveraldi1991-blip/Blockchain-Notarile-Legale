@@ -103,7 +103,7 @@ with st.form("notarizzazione_avanzata"):
     """
     components.html(canvas_html, height=180)
 
-    conferma_firma = st.checkbox("Dichiaro di aver verificato l'identità e appongo la mia firma.")
+    conferma_firma = st.checkbox("Dichiaro di aver verificato l'identità e verificato nel caso di una società i relativi poteri e appongo la mia firma.")
 
     st.markdown("<br>", unsafe_allow_html=True)
     submit = st.form_submit_button("SIGILLA ATTO IN BLOCKCHAIN")
