@@ -1,6 +1,6 @@
 import streamlit as st
 import datetime
-import pandas as pd
+import hashlib
 
 # 1. CONFIGURAZIONE PAGINA
 st.set_page_config(
@@ -37,86 +37,106 @@ def apply_custom_design():
             border-radius: 10px !important;
         }
 
-        /* BADGE STATO */
-        .status-active { background: #e8f5e9; color: #2e7d32; padding: 4px 12px; border-radius: 15px; font-weight: 600; font-size: 0.8rem; border: 1px solid #2e7d32; }
-        .status-pending { background: #fff3e0; color: #ef6c00; padding: 4px 12px; border-radius: 15px; font-weight: 600; font-size: 0.8rem; border: 1px solid #ef6c00; }
+        /* BADGE STATO DINAMICI */
+        .status-active { background: #fff3e0; color: #ef6c00; padding: 4px 12px; border-radius: 15px; font-weight: 600; font-size: 0.8rem; border: 1px solid #ef6c00; }
+        .status-completed { background: #e8f5e9; color: #2e7d32; padding: 4px 12px; border-radius: 15px; font-weight: 600; font-size: 0.8rem; border: 1px solid #2e7d32; }
+
+        /* FILE UPLOADER STYLE */
+        [data-testid="stFileUploader"] section {
+            background-color: #fafafa !important;
+            border: 1px dashed #b89333 !important;
+            border-radius: 10px !important;
+            padding: 10px !important;
+        }
         </style>
     """, unsafe_allow_html=True)
 
 apply_custom_design()
 
-# Inizializzazione sessione per contratti
+# Inizializzazione sessione
 if 'smart_contracts' not in st.session_state:
     st.session_state.smart_contracts = []
 
 st.title("⚡ Smart Contracts Manager")
-st.markdown('<p style="font-size: 1.1rem; color: #1a2a6c;">Automazione legale per contratti di manutenzione e servizi professionali.</p>', unsafe_allow_html=True)
+st.markdown('<p style="font-size: 1.1rem; color: #1a2a6c;">Gestione contratti di manutenzione e servizi con sblocco automatico dei fondi.</p>', unsafe_allow_html=True)
 
 st.markdown("---")
 
-col_setup, col_monitor = st.columns([1, 1.2])
+col_setup, col_monitor = st.columns([1, 1.3])
 
+# --- COLONNA SINISTRA: CREAZIONE ---
 with col_setup:
     st.markdown('<div class="notary-card">', unsafe_allow_html=True)
-    st.subheader("🛠️ Configura Nuovo Accordo")
+    st.subheader("🛠️ Crea Nuovo Accordo")
     
     with st.form("sc_form", clear_on_submit=True):
-        nome_contratto = st.text_input("Oggetto del Contratto (es. Manutenzione Ascensori)")
-        fornitore = st.text_input("Fornitore / Partita IVA")
+        nome_contratto = st.text_input("Oggetto del Contratto")
+        fornitore = st.text_input("Fornitore (P.IVA)")
         
         c1, c2 = st.columns(2)
         with c1:
-            budget = st.number_input("Budget Sbloccabile (€)", min_value=0.0, step=100.0)
+            budget = st.number_input("Budget (€)", min_value=0.0, step=50.0)
         with c2:
-            scadenza = st.date_input("Termine Intervento", datetime.date.today() + datetime.timedelta(days=30))
+            scadenza = st.date_input("Scadenza", datetime.date.today() + datetime.timedelta(days=30))
         
-        tipo_servizio = st.selectbox("Tipo di Trigger", ["Caricamento Verbale Tecnico", "Rilevazione Uptime (SLA)", "Consegna Milestone Software"])
+        trigger = st.selectbox("Trigger di Sblocco", ["Caricamento Verbale", "Approvazione Cliente"])
         
         st.markdown("<br>", unsafe_allow_html=True)
         attivazione = st.form_submit_button("ATTIVA SMART CONTRACT")
         
-        if attivazione:
-            if nome_contratto and fornitore:
-                nuovo_sc = {
-                    "id": len(st.session_state.smart_contracts) + 1,
-                    "nome": nome_contratto,
-                    "fornitore": fornitore,
-                    "budget": budget,
-                    "scadenza": scadenza.strftime("%d/%m/%Y"),
-                    "stato": "ATTIVO (In attesa evento)",
-                    "tipo": tipo_servizio
-                }
-                st.session_state.smart_contracts.append(nuovo_sc)
-                st.success("Contratto attivato sulla rete!")
-            else:
-                st.error("Compila i campi obbligatori.")
+        if attivazione and nome_contratto:
+            nuovo_sc = {
+                "id": hashlib.md5(nome_contratto.encode()).hexdigest()[:8],
+                "nome": nome_contratto,
+                "fornitore": fornitore,
+                "budget": budget,
+                "scadenza": scadenza.strftime("%d/%m/%Y"),
+                "stato": "IN ATTESA",
+                "tipo": trigger,
+                "completato": False
+            }
+            st.session_state.smart_contracts.append(nuovo_sc)
+            st.success("Contratto deployato con successo!")
     st.markdown('</div>', unsafe_allow_html=True)
 
+# --- COLONNA DESTRA: MONITORAGGIO ---
 with col_monitor:
-    st.subheader("📡 Dashboard Contratti Attivi")
+    st.subheader("📡 Monitoraggio in Tempo Reale")
     
     if not st.session_state.smart_contracts:
-        st.info("Nessun contratto attivo. Usa il modulo a sinistra per iniziare.")
+        st.info("Nessun contratto attivo nel sistema.")
     else:
-        for sc in st.session_state.smart_contracts:
+        for idx, sc in enumerate(st.session_state.smart_contracts):
+            # Determiniamo la classe CSS del badge
+            badge_class = "status-completed" if sc['completato'] else "status-active"
+            status_text = "COMPLETATO - PAGAMENTO SBLOCCATO" if sc['completato'] else "IN ATTESA DI VERBALE"
+            
             st.markdown(f"""
             <div class="notary-card">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <h4 style="margin:0;">{sc['nome']}</h4>
-                    <span class="status-pending">{sc['stato']}</span>
+                    <span class="{badge_class}">{status_text}</span>
                 </div>
                 <hr style="margin: 10px 0; border: 0; border-top: 1px solid #eee;">
-                <p style="font-size: 0.9rem; margin-bottom: 5px;">
-                    <b>Partner:</b> {sc['fornitore']} | <b>Budget:</b> €{sc['budget']:,}<br>
-                    <b>Condizione:</b> {sc['tipo']}<br>
-                    <b>Scadenza prevista:</b> {sc['scadenza']}
+                <p style="font-size: 0.9rem; margin-bottom: 10px;">
+                    <b>Partner:</b> {sc['fornitore']} | <b>Importo:</b> €{sc['budget']:,}<br>
+                    <b>Scadenza:</b> {sc['scadenza']} | <b>ID:</b> SC-{sc['id']}
                 </p>
-                <div style="display: flex; gap: 10px; margin-top: 10px;">
-                    <small style="color: #666;">ID Contratto: SC-00{sc['id']}</small>
-                </div>
-            </div>
             """, unsafe_allow_html=True)
+            
+            # Se il contratto non è completato, mostriamo il caricamento verbale
+            if not sc['completato']:
+                file_verbale = st.file_uploader(f"Carica Verbale per {sc['nome']}", type=["pdf"], key=f"up_{sc['id']}")
+                if file_verbale:
+                    # Logica di sblocco
+                    st.session_state.smart_contracts[idx]['completato'] = True
+                    st.session_state.smart_contracts[idx]['stato'] = "COMPLETATO"
+                    st.rerun()
+            else:
+                st.markdown("<p style='color: #2e7d32; font-weight: bold;'>✅ Fondi trasferiti con successo al fornitore.</p>", unsafe_allow_html=True)
+            
+            st.markdown("</div>", unsafe_allow_html=True)
 
 st.sidebar.markdown("---")
-st.sidebar.write("🛡️ **Garanzia Legale:**")
-st.sidebar.info("Le clausole sono blindate tramite hash crittografico e immodificabili.")
+st.sidebar.write("⚡ **Smart Engine:** Attivo")
+st.sidebar.write(f"Contratti gestiti: **{len(st.session_state.blockchain) + len(st.session_state.smart_contracts)}**")
